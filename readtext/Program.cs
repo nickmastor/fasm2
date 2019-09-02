@@ -37,17 +37,7 @@ namespace readtext
                 Console.WriteLine("\t" + line);
             }
             string a = lines[0];
-            for (int i = 0; i < 4;  i++ )
-            {
-
-                Console.WriteLine(a.Substring(0, i));
-            };
-
-            int [] numbers = new int[] { 3, 14, 15, 92, 6 };
-            foreach (int number in numbers)
-            {
-                Console.Write($"{number} "+"nike\n");
-            }
+           
             Console.WriteLine();
             // Keep the console window open in debug mode.
             Console.WriteLine("Press any key to exit.");
