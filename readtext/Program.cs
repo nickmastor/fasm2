@@ -16,13 +16,17 @@ namespace THEFINALTEST
     {
         int Q = 0;
 
+        private const float CZoomScale = 4f;
+        private int FZoomLevel = 0;
+
+
+
         public Form1()
         {
             
             InitializeComponent();
             comboBox1.Items.Add("mass");
             comboBox1.Items.Add("time");
-        
         }
         private void Button1_Click_1(object sender, EventArgs e)
         {
@@ -106,7 +110,9 @@ namespace THEFINALTEST
 
                 }
                 chart1.DataSource = dt;
-                chart1.Series["Series1"].XValueMember = "X_Value";
+                chart1.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
+                    chart1.ChartAreas[0].AxisY.ScaleView.Zoomable = true;
+            chart1.Series["Series1"].XValueMember = "X_Value";
                 chart1.Series["Series1"].YValueMembers = "Y_Value";
                 chart1.Series["Series1"].ChartType = SeriesChartType.Line;
                 chart1.ChartAreas[0].AxisY.LabelStyle.Format = "";
@@ -114,10 +120,13 @@ namespace THEFINALTEST
             
 
         }
-        private void ComboBox1_SelectedIndexChanged(object sender, EventArgs e)
+
+     
+           
+            private void ComboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
 
-            if (comboBox1.SelectedItem == "maze")
+            if (comboBox1.SelectedItem == "mass")
             {
                 Q = 1;
             }
@@ -174,6 +183,38 @@ namespace THEFINALTEST
 
         }
 
-        
+        private void Chart1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Chart1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            Axis ax = chart1.ChartAreas[0].AxisX;
+            ax.ScaleView.Size = double.IsNaN(ax.ScaleView.Size) ?
+                                (ax.Maximum - ax.Minimum) / 2 : ax.ScaleView.Size /= 2;
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+         
+        }
+
+        private void Chart1_MouseClick(object sender, MouseEventArgs e)
+        {
+            
+        }
+
+        private void Chart1_KeyDown(object sender, KeyEventArgs e)
+        {
+            Axis ax = chart1.ChartAreas[0].AxisX;
+            ax.ScaleView.Size = double.IsNaN(ax.ScaleView.Size) ?
+                                ax.Maximum : ax.ScaleView.Size *= 2;
+            if (ax.ScaleView.Size > ax.Maximum - ax.Minimum)
+            {
+                ax.ScaleView.Size = ax.Maximum;
+                ax.ScaleView.Position = 0;
+            }
+        }
     }
 }
