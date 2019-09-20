@@ -19,7 +19,7 @@ namespace THEFINALTEST
         private const float CZoomScale = 4f;
         private int FZoomLevel = 0;
 
-
+        int rg = 1;
 
         public Form1()
         {
@@ -27,6 +27,10 @@ namespace THEFINALTEST
             InitializeComponent();
             comboBox1.Items.Add("mass");
             comboBox1.Items.Add("time");
+            comboBox2.Items.Add("x1");
+            comboBox2.Items.Add("x4");
+            comboBox2.Items.Add("x25");
+            comboBox2.Items.Add("x100");
         }
         private void Button1_Click_1(object sender, EventArgs e)
         {
@@ -45,79 +49,115 @@ namespace THEFINALTEST
       
         private void createChart(string filename, int Q)
         {
-          
-                DataTable dt = new DataTable();
-                dt.Columns.Add("X_Value", typeof(double));
-                dt.Columns.Add("Y_Value", typeof(double));
 
-             
-                int size = 0;
 
-                List<double> firstcolumn = new List<double>();
-                List<double> secondcolumn = new List<double>();
+            DataTable dt = new DataTable();
+            dt.Columns.Add("X_Value", typeof(double));
+            dt.Columns.Add("Y_Value", typeof(double));
+            dt.Columns.Add("z", typeof(double));
+            dt.Columns.Add("red", typeof(double));
 
-                string[] lines = System.IO.File.ReadAllLines($"{filename}");
+            int size = 0;
+
+            List<double> firstcolumn = new List<double>();
+            List<double> secondcolumn = new List<double>();
+            List<double> thirdcolumn = new List<double>();
+            List<double> fourthcolumn = new List<double>();
+            string[] lines = System.IO.File.ReadAllLines($"{filename}");
             // Display the file contents by using a foreach loop.
-               // System.Console.WriteLine("Contents of WriteLines2.txt1 = ");
-                int start = 0;
-                foreach (string line in lines)
-                {
-                    // Use a tab to indent each line of the file.
-                    double[] b = new double[3];
+            // System.Console.WriteLine("Contents of WriteLines2.txt1 = ");
+            int start = 0;
+            foreach (string line in lines)
+            {
+                // Use a tab to indent each line of the file.
+                double[] b = new double[3];
+                double max = 0;
+                int g = 0;
+                string a = "";
+                if (line.Contains("Spectrum duration [us]:"))
+                {      //to found the start value and the max value
 
-                    int g = 0;
-                    string a = "";
-                    if (line.Contains("Spectrum duration [us]:"))
-                    {      //to found the start value and the max value
-
-                        a = "Spectrum duration [us]:";
+                    a = "Spectrum duration [us]:";
                     MessageBox.Show(a);
                     g = get_number(line, a);
-                        //Console.WriteLine(g);
+                    //Console.WriteLine(g);
 
-                    };
-                    if (line.Contains("Spectrum delay [us]:"))
-                    {
-                        a = "Spectrum delay [us]:";
-
-                        g = get_number(line, a);
-                        // Console.WriteLine(g);
-                    };
-                    if (start == 1)
-                    {
-
-                        b = get_the_elements(line, Q);                               ///start finding the numbers i have to store
-                   
-                        firstcolumn.Add(b[0]);
-                        secondcolumn.Add(b[2]);
-                        size++;
-                        // Console.WriteLine($"{b[Q]} {b[2]}");
-                    };
-                    if (line.Contains("time[ns]"))
-                    {
-                        start = 1;
-
-
-
-                    };
-
-
-
-                }
-                for (int i = 0; i < (size - 1) / 1; i++)
+                };
+                if (line.Contains("Spectrum delay [us]:"))
                 {
-                    dt.Rows.Add(firstcolumn[i], secondcolumn[i]);
+                    a = "Spectrum delay [us]:";
 
-                }
-                chart1.DataSource = dt;
-                chart1.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
-                    chart1.ChartAreas[0].AxisY.ScaleView.Zoomable = true;
-            chart1.Series["Series1"].XValueMember = "X_Value";
-                chart1.Series["Series1"].YValueMembers = "Y_Value";
-                chart1.Series["Series1"].ChartType = SeriesChartType.Line;
-                chart1.ChartAreas[0].AxisY.LabelStyle.Format = "";
+                    g = get_number(line, a);
+                    // Console.WriteLine(g);
+                };
+                if (start == 1)
+                {
 
-            
+                    b = get_the_elements(line, Q);                               ///start finding the numbers i have to store
+
+                    firstcolumn.Add(b[0]);
+                    secondcolumn.Add(b[2] / 100000);
+                    size++;
+                    if (Math.Abs(b[2]) < (rg * 100000 / 256))
+                    {
+                        thirdcolumn.Add(((b[2] * rg) / 100000));
+                        //MessageBox.Show(Convert.ToString(b[2] / 10000));
+                    }
+                    else { thirdcolumn.Add(0); }
+
+                    if (thirdcolumn[size - 1] == 0)
+                    {
+                        fourthcolumn.Add(b[2] / 100000);
+
+                    }
+                    else
+                    {
+                        fourthcolumn.Add(((b[2] * rg) / 100000));
+                    }
+
+                    // Console.WriteLine($"{b[Q]} {b[2]}");
+                };
+                if (line.Contains("time[ns]"))
+                {
+                    start = 1;
+
+
+
+                };
+
+
+
+            }
+
+            /*  dt.Columns.Add("moth", GetType());
+              dt.Columns.Add("x1", GetType());
+              dt.Columns.Add("x25", GetType());*/
+            for (int i = 0; i < (size - 1) / 1; i++)
+            {
+
+                dt.Rows.Add(firstcolumn[i], secondcolumn[i], thirdcolumn[i], fourthcolumn[i]);
+
+            }
+
+            //this.chart1.Series["x1"].Points.AddXY = dt;
+            chart1.DataSource = dt;
+
+
+
+            /*chart1.DataSource. = { dt;,"x1"; }*/
+            chart1.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
+            chart1.ChartAreas[0].AxisY.ScaleView.Zoomable = true;
+            chart1.Series["x1"].XValueMember = "X_Value";
+            chart1.Series["x1"].YValueMembers = "Y_Value";
+            chart1.Series["x1"].ChartType = SeriesChartType.Line;
+
+            chart1.Series["xrg"].XValueMember = "X_Value";
+            chart1.Series["xrg"].YValueMembers = "z";
+            chart1.Series["xrg"].ChartType = SeriesChartType.Line;
+            chart1.Series["final"].XValueMember = "X_Value";
+            chart1.Series["final"].YValueMembers = "red";
+            chart1.Series["final"].ChartType = SeriesChartType.Line;
+            chart1.ChartAreas[0].AxisY.LabelStyle.Format = "";
 
         }
 
@@ -215,6 +255,26 @@ namespace THEFINALTEST
                 ax.ScaleView.Size = ax.Maximum;
                 ax.ScaleView.Position = 0;
             }
+        }
+
+        private void ComboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+            if (comboBox2.SelectedItem == "x1")
+            {
+                rg= 1;
+            }
+            else if (comboBox2.SelectedItem == "x4")
+            {
+                rg = 4;
+            }else if(comboBox2.SelectedItem == "x25")
+            {
+                rg = 25;
+            }else if (comboBox2.SelectedItem == "x100")
+            {
+                rg = 100;
+
+            };
         }
     }
 }
