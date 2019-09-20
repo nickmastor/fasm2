@@ -71,14 +71,14 @@ namespace THEFINALTEST
             {
                 // Use a tab to indent each line of the file.
                 double[] b = new double[3];
-                double max = 0;
+               
                 int g = 0;
                 string a = "";
                 if (line.Contains("Spectrum duration [us]:"))
                 {      //to found the start value and the max value
 
                     a = "Spectrum duration [us]:";
-                    MessageBox.Show(a);
+                  //  MessageBox.Show(a);
                     g = get_number(line, a);
                     //Console.WriteLine(g);
 
@@ -128,11 +128,20 @@ namespace THEFINALTEST
 
 
             }
-
-            /*  dt.Columns.Add("moth", GetType());
-              dt.Columns.Add("x1", GetType());
-              dt.Columns.Add("x25", GetType());*/
-            for (int i = 0; i < (size - 1) / 1; i++)
+            double max = secondcolumn.Max();
+            double avg = secondcolumn.Average();
+            double noisedeviationn = 0;
+            double noisesize = 0;
+            for (int j=0; j < size - 1; j++)
+            {
+                if (secondcolumn[j] < (max * 0.1 / 255))
+                {
+                    noisedeviationn = +(Math.Pow(secondcolumn[j] - avg, 2));
+                    noisesize++;                //θεωρω οτι θορυβος ειναι κατω απο 0.1*Vmax/255  
+                }
+                };
+            noisedeviationn = Math.Sqrt(noisedeviationn / noisesize);
+            for (int i = 0; i < (size - 1) ; i++)
             {
 
                 dt.Rows.Add(firstcolumn[i], secondcolumn[i], thirdcolumn[i], fourthcolumn[i]);
@@ -158,6 +167,7 @@ namespace THEFINALTEST
             chart1.Series["final"].YValueMembers = "red";
             chart1.Series["final"].ChartType = SeriesChartType.Line;
             chart1.ChartAreas[0].AxisY.LabelStyle.Format = "";
+            MessageBox.Show($"standard deviation ={noisedeviationn}");
 
         }
 
@@ -176,6 +186,7 @@ namespace THEFINALTEST
             };
 
         }
+
         public static int get_number(string line1, string notablePhrase)
         {
 
